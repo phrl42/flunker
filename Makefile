@@ -2,8 +2,8 @@ SRC_DIR = src/
 OBJ_DIR = bin/
 INC_DIR = include/
 
-NAME = touhou-bunker
-
+NAME = flunker
+# preprocessor (insert all libraries into one big C file) -> compiler (converts C code to assembly code) -> assembler (generates binary files) -> linker (links binary files altogether)
 SRCS = main.c init.c
 OBJS = $(addprefix $(OBJ_DIR), $(SRCS:.c=.o))
 
