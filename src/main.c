@@ -13,7 +13,9 @@ int main()
         SDL_RenderClear(rend);
 
         // render stuff here
-
+        drawLanes();
+        moveLanes();
+        rectPlayer.y += 2;
         // switch front buffer with back buffer or vice versa
         SDL_RenderPresent(rend);
         while (SDL_PollEvent(&ev))
@@ -28,7 +30,7 @@ int main()
                 switch (ev.key.keysym.sym)
                 {
                 case SDLK_SPACE:
-                    SDL_Log("aa\n");
+                    rectPlayer.y -= 50;
                     break;
                 }
                 break;
@@ -39,5 +41,5 @@ int main()
         }
     }
 
-    return 0;
+    errorSolution();
 }

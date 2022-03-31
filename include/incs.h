@@ -1,7 +1,7 @@
 #ifndef __includes__
 #define __includes__
 
-#define WIDTH 1280
+#define WIDTH 1300
 #define HEIGHT 960
 
 #include <stdbool.h>
