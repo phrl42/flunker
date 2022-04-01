@@ -3,11 +3,16 @@
 SDL_Window *win;
 SDL_Renderer *rend;
 
-SDL_Rect rectBottom = {0, HEIGHT - 101, WIDTH, 100};
-SDL_Rect rectTop = {0, 0, WIDTH, 100};
+SDL_Rect rectBottom = {0, HEIGHT - 100, WIDTH + WIDTH + 100, 100};
+SDL_Rect pipeBottom = {WIDTH + 100, HEIGHT - 200, 100, 100};
 
 SDL_Rect rectPlayer = {(WIDTH / 2) - 100, HEIGHT / 2, 20, 20};
 
+SDL_Texture *textureGround;
+
+const Uint8* keys;
+
+int honecker = -1400;
 void init()
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
@@ -23,14 +28,18 @@ void init()
     {
         SDL_Log("initializing renderer failed: %s\n", SDL_GetError());
     }
+    
+    IMG_Init(IMG_INIT_PNG);
+    
+    textureGround = IMG_LoadTexture(rend, "src/img/ground.png");
 }
 
 void drawLanes()
 {
-    SDL_SetRenderDrawColor(rend, 0, 255, 10, 0);
+    SDL_RenderCopy(rend, textureGround, NULL, &rectBottom);
 
-    SDL_RenderDrawRect(rend, &rectBottom);
-    SDL_RenderDrawRect(rend, &rectTop);
+    SDL_SetRenderDrawColor(rend, 0, 0, 255, 0);
+    SDL_RenderFillRect(rend, &pipeBottom);
 
     SDL_SetRenderDrawColor(rend, 255, 0, 0, 0);
 
@@ -39,24 +48,56 @@ void drawLanes()
     SDL_SetRenderDrawColor(rend, 0, 0, 0, 0);
 }
 
+void playerMovement()
+{
+    if(rectPlayer.y + rectPlayer.h >= rectBottom.y)
+    {
+        return;
+    }
+    rectPlayer.y += 3; // physics
+
+    keys = SDL_GetKeyboardState(NULL);
+
+    if(keys[SDL_SCANCODE_SPACE] == 1)
+    {
+        rectPlayer.y -= 10;
+    }
+}
+
+void generatePipes()
+{
+    // reset 
+    if(pipeBottom.x + pipeBottom.w < 0)
+    {
+        SDL_Log("pipeBottom.x: %d", pipeBottom.x);
+        pipeBottom.x = WIDTH + pipeBottom.w;
+    }
+    else
+    {
+        // move pipe to the position (that constantly changes) below
+        pipeBottom.x = (rectBottom.x + WIDTH);
+    }
+}
+
 void moveLanes()
 {
-    if(rectBottom.x + WIDTH < WIDTH)
-    {
-        rectBottom.w += 3;
-    }
-    rectBottom.x -= 3;
 
-    if(rectTop.x + WIDTH < WIDTH)
+    if(rectBottom.x < honecker)
     {
-        rectTop.w += 3;
+        rectBottom.x = 0;
+        return;
     }
-    rectTop.x -= 3;
+
+    rectBottom.x -= 4;
+
+    generatePipes();
 }
 
 void errorSolution()
 {
+    SDL_DestroyTexture(textureGround);
     SDL_DestroyRenderer(rend);
     SDL_DestroyWindow(win);
+    IMG_Quit();
     SDL_Quit();
 }

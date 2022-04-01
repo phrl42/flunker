@@ -6,14 +6,11 @@
 extern SDL_Renderer *rend;
 extern SDL_Window *win;
 
-extern SDL_Rect rectBottom;
-extern SDL_Rect rectTop;
-
-extern SDL_Rect rectPlayer;
-
 void init();
 void drawLanes();
 void moveLanes();
+void generatePipes();
+void playerMovement();
 void errorSolution();
 
 #endif
