@@ -137,8 +137,8 @@ void moveLanes()
         rectBottom.x = 0;
         for (int i = 0; i < pipes; i++)
         {
-            pipeBottom[i].h = randRange(100, (HEIGHT / 2) - rectBottom.h);
-            pipeTop[i].h = randRange(100, HEIGHT / 2);
+            //pipeBottom[i].h = randRange(100, (HEIGHT / 2) - rectBottom.h);
+            //pipeTop[i].h = randRange(100, HEIGHT / 2);
         }
     }
 
