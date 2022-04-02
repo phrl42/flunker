@@ -61,8 +61,9 @@ void init()
         pipeBottom[i].h = randRange(100, (HEIGHT / 2) - rectBottom.h);
         pipeTop[i].h = randRange(100, HEIGHT / 2);
 
-        pipeTop[i].x = WIDTH - (i * 242);
-        pipeBottom[i].x = WIDTH - (i * 242);
+        // 264 is the nearest possible value for the distance between the pipes (one could calculate this)
+        pipeTop[i].x = WIDTH - (i * 264);
+        pipeBottom[i].x = WIDTH - (i * 264);
     }
 }
 
@@ -101,11 +102,14 @@ void playerMovement()
         return;
     }
 
-    // bottom collision brezhnev == some pseudo rect
-    if (SDL_IntersectRect(&rectPlayer, &pipeBottom[0], &brezhnev) == SDL_TRUE || SDL_IntersectRect(&rectPlayer, &pipeTop[0], &brezhnev) == SDL_TRUE)
+    // pipe collision (brezhnev == some pseudo rect)
+    for (int i = 0; i < pipes; i++)
     {
-        speed = 0;
-        return;
+        if (SDL_IntersectRect(&rectPlayer, &pipeBottom[i], &brezhnev) == SDL_TRUE || SDL_IntersectRect(&rectPlayer, &pipeTop[i], &brezhnev) == SDL_TRUE)
+        {
+            speed = 0;
+            return;
+        }
     }
 
     rectPlayer.y += speed; // ,,physics''
@@ -118,7 +122,7 @@ void playerMovement()
 
 void generatePipes()
 {
-    // spawn location / resetting
+    // spawn location / resetting pipes
     for (int i = 0; i < pipes; i++)
     {
         if (pipeBottom[i].x < 0)
@@ -131,29 +135,24 @@ void generatePipes()
 
 void moveLanes()
 {
-    // "resetting"
+    // resetting ground
     if (rectBottom.x <= honecker)
     {
         rectBottom.x = 0;
-        for (int i = 0; i < pipes; i++)
-        {
-            //pipeBottom[i].h = randRange(100, (HEIGHT / 2) - rectBottom.h);
-            //pipeTop[i].h = randRange(100, HEIGHT / 2);
-        }
     }
 
-    // (de)crement (stage movement)
+    // stage movement
     rectBottom.x -= speed;
-    // make bottom pipe's y coordinate depend on height
+
     for (int i = 0; i < pipes; i++)
     {
+        // make bottom pipe's y coordinate depend on its height
         pipeBottom[i].y = (HEIGHT - pipeBottom[i].h) - rectBottom.h;
 
         // and move the pipe mate
         pipeBottom[i].x -= speed;
         pipeTop[i].x -= speed;
     }
-
     generatePipes();
 }
 
