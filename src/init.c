@@ -50,6 +50,7 @@ void drawLanes()
 
 void playerMovement()
 {
+    // ground collision
     if(rectPlayer.y + rectPlayer.h >= rectBottom.y)
     {
         return;
@@ -66,26 +67,14 @@ void playerMovement()
 
 void generatePipes()
 {
-    // reset 
-    if(pipeBottom.x + pipeBottom.w < 0)
-    {
-        SDL_Log("pipeBottom.x: %d", pipeBottom.x);
-        pipeBottom.x = WIDTH + pipeBottom.w;
-    }
-    else
-    {
-        // move pipe to the position (that constantly changes) below
-        pipeBottom.x = (rectBottom.x + WIDTH);
-    }
+    pipeBottom.x = (rectBottom.x + WIDTH);
 }
 
 void moveLanes()
 {
-
-    if(rectBottom.x < honecker)
+    if(rectBottom.x <= honecker)
     {
         rectBottom.x = 0;
-        return;
     }
 
     rectBottom.x -= 4;
