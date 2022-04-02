@@ -3,6 +3,7 @@
 int main()
 {
     bool gameLoop = true;
+    bool start = false;
     SDL_Event ev;
 
     init();
@@ -14,8 +15,11 @@ int main()
 
         // render stuff here
         drawLanes();
-        moveLanes();
-        playerMovement();
+        if (start)
+        {
+            moveLanes();
+            playerMovement();
+        }
         // switch front buffer with back buffer or vice versa
         SDL_RenderPresent(rend);
         while (SDL_PollEvent(&ev))
@@ -24,6 +28,16 @@ int main()
             {
             case SDL_QUIT:
                 gameLoop = false;
+                break;
+
+            case SDL_KEYDOWN:
+
+                switch (ev.key.keysym.sym)
+                {
+                case SDLK_RETURN:
+                    start = true;
+                    break;
+                }
                 break;
 
             default:

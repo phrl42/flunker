@@ -6,11 +6,11 @@
 extern SDL_Renderer *rend;
 extern SDL_Window *win;
 
+void randRange();
 void init();
 void drawLanes();
 void moveLanes();
 void generatePipes();
-void randRange();
 void playerMovement();
 void errorSolution();
 
