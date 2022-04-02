@@ -10,6 +10,7 @@ void init();
 void drawLanes();
 void moveLanes();
 void generatePipes();
+void randRange();
 void playerMovement();
 void errorSolution();
 
