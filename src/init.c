@@ -11,6 +11,9 @@ int honecker = (WIDTH + objWidth) * -1;
 
 int speed = 4;
 
+int score = 0;
+int highscore = 0;
+
 SDL_Window *win;
 SDL_Renderer *rend;
 
@@ -19,11 +22,18 @@ SDL_Rect rectBottom = {0, HEIGHT - 100, WIDTH + WIDTH + 100, 100};
 SDL_Rect pipeBottom[5];
 SDL_Rect pipeTop[5];
 
+SDL_Rect pipeBottomHead[5];
+SDL_Rect pipeTopHead[5];
+
 SDL_Rect brezhnev = {0, 0, 0, 0};
 
-SDL_Rect rectPlayer = {(WIDTH / 3) - 100, HEIGHT / 2, 20, 20};
+SDL_Rect rectPlayer = {1 + (WIDTH / 3) - 100, HEIGHT / 2, 20, 20};
 
 SDL_Texture *textureGround;
+
+SDL_Texture *texturePipe;
+SDL_Texture *texturePipeBottom;
+SDL_Texture *texturePipeTop;
 
 // stolen from phrl42/pong
 
@@ -54,16 +64,28 @@ void init()
 
     textureGround = IMG_LoadTexture(rend, "src/img/ground.png");
 
+    texturePipe = IMG_LoadTexture(rend, "src/img/pipe.png");
+    texturePipeBottom = IMG_LoadTexture(rend, "src/img/pipeHeadUp.png");
+    texturePipeTop = IMG_LoadTexture(rend, "src/img/pipeHeadDown.png");
+
+
     for (int i = 0; i < pipes; i++)
     {
         pipeBottom[i].w = objWidth;
         pipeTop[i].w = objWidth;
-        pipeBottom[i].h = randRange(100, (HEIGHT / 2) - rectBottom.h);
-        pipeTop[i].h = randRange(100, HEIGHT / 2);
+        pipeBottom[i].h = randRange(pipeBottom[i].h, (HEIGHT / 2) - rectBottom.h);
+        pipeTop[i].h = randRange(pipeTop[i].h, HEIGHT / 2);
 
         // 264 is the nearest possible value for the distance between the pipes (one could calculate this)
         pipeTop[i].x = WIDTH - (i * 264);
         pipeBottom[i].x = WIDTH - (i * 264);
+
+        pipeBottomHead[i].h = 18;
+        pipeTopHead[i].h = 18;
+        pipeBottomHead[i].w = objWidth;
+        pipeTopHead[i].w = objWidth;
+        pipeBottomHead[i].x = pipeBottom[i].x;
+        pipeTopHead[i].x = pipeTop[i].x;
     }
 }
 
@@ -75,8 +97,11 @@ void drawLanes()
 
     for (int i = 0; i < pipes; i++)
     {
-        SDL_RenderFillRect(rend, &pipeBottom[i]);
-        SDL_RenderFillRect(rend, &pipeTop[i]);
+        SDL_RenderCopy(rend, texturePipe, NULL, &pipeBottom[i]);
+        SDL_RenderCopy(rend, texturePipe, NULL, &pipeTop[i]);
+
+        SDL_RenderCopy(rend, texturePipeBottom, NULL, &pipeBottomHead[i]);
+        SDL_RenderCopy(rend, texturePipeTop, NULL, &pipeTopHead[i]);
     }
 
     SDL_SetRenderDrawColor(rend, 255, 0, 0, 0);
@@ -105,7 +130,7 @@ void playerMovement()
     // pipe collision (brezhnev == some pseudo rect)
     for (int i = 0; i < pipes; i++)
     {
-        if (SDL_IntersectRect(&rectPlayer, &pipeBottom[i], &brezhnev) == SDL_TRUE || SDL_IntersectRect(&rectPlayer, &pipeTop[i], &brezhnev) == SDL_TRUE)
+        if (SDL_IntersectRect(&rectPlayer, &pipeBottomHead[i], &brezhnev) == SDL_TRUE || SDL_IntersectRect(&rectPlayer, &pipeTopHead[i], &brezhnev) == SDL_TRUE)
         {
             speed = 0;
             return;
@@ -148,16 +173,42 @@ void moveLanes()
     {
         // make bottom pipe's y coordinate depend on its height
         pipeBottom[i].y = (HEIGHT - pipeBottom[i].h) - rectBottom.h;
+        pipeBottomHead[i].y = pipeBottom[i].y - pipeBottomHead[i].h;
 
-        // and move the pipe mate
+
+        // make pipeTopHead relative to pipeTop's height
+        pipeTopHead[i].y = pipeTop[i].h;
+
+        // and move the pipes mate
         pipeBottom[i].x -= speed;
+        pipeBottomHead[i].x = pipeBottom[i].x;
+        
         pipeTop[i].x -= speed;
+        pipeTopHead[i].x = pipeTop[i].x;
     }
     generatePipes();
 }
 
+void points()
+{
+    for(int i = 0; i < pipes; i++)
+    {
+        if(pipeBottom[i].x + objWidth == rectPlayer.x)
+        {
+            score++;
+        }
+    }
+}
+
+void menuStuff()
+{
+    
+}
+
 void errorSolution()
 {
+    SDL_DestroyTexture(texturePipeTop);
+    SDL_DestroyTexture(texturePipeBottom);
     SDL_DestroyTexture(textureGround);
     SDL_DestroyRenderer(rend);
     SDL_DestroyWindow(win);

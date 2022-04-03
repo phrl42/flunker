@@ -12,6 +12,8 @@ void drawLanes();
 void moveLanes();
 void generatePipes();
 void playerMovement();
+void points();
+void menuStuff();
 void errorSolution();
 
 #endif
