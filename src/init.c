@@ -27,7 +27,7 @@ SDL_Rect pipeTopHead[5];
 
 SDL_Rect brezhnev = {0, 0, 0, 0};
 
-SDL_Rect rectPlayer = {1 + (WIDTH / 3) - 100, HEIGHT / 2, 20, 20};
+SDL_Rect rectPlayer = {3 + (WIDTH / 3) - 100, HEIGHT / 2, 20, 20};
 
 SDL_Texture *textureGround;
 
@@ -71,8 +71,8 @@ void init()
 
     for (int i = 0; i < pipes; i++)
     {
-        pipeBottom[i].w = objWidth;
-        pipeTop[i].w = objWidth;
+        pipeBottom[i].w = 82;
+        pipeTop[i].w = 82;
         pipeBottom[i].h = randRange(pipeBottom[i].h, (HEIGHT / 2) - rectBottom.h);
         pipeTop[i].h = randRange(pipeTop[i].h, HEIGHT / 2);
 
@@ -84,8 +84,8 @@ void init()
         pipeTopHead[i].h = 18;
         pipeBottomHead[i].w = objWidth;
         pipeTopHead[i].w = objWidth;
-        pipeBottomHead[i].x = pipeBottom[i].x;
-        pipeTopHead[i].x = pipeTop[i].x;
+        pipeBottomHead[i].x = pipeBottom[i].x - 18;
+        pipeTopHead[i].x = pipeTop[i].x - 18;
     }
 }
 
@@ -130,7 +130,7 @@ void playerMovement()
     // pipe collision (brezhnev == some pseudo rect)
     for (int i = 0; i < pipes; i++)
     {
-        if (SDL_IntersectRect(&rectPlayer, &pipeBottomHead[i], &brezhnev) == SDL_TRUE || SDL_IntersectRect(&rectPlayer, &pipeTopHead[i], &brezhnev) == SDL_TRUE)
+        if (SDL_IntersectRect(&rectPlayer, &pipeBottomHead[i], &brezhnev) == SDL_TRUE || SDL_IntersectRect(&rectPlayer, &pipeTopHead[i], &brezhnev) == SDL_TRUE || SDL_IntersectRect(&rectPlayer, &pipeTop[i], &brezhnev) == SDL_TRUE || SDL_IntersectRect(&rectPlayer, &pipeBottom[i], &brezhnev) == SDL_TRUE)
         {
             speed = 0;
             return;
@@ -181,10 +181,10 @@ void moveLanes()
 
         // and move the pipes mate
         pipeBottom[i].x -= speed;
-        pipeBottomHead[i].x = pipeBottom[i].x;
+        pipeBottomHead[i].x = pipeBottom[i].x - (pipeBottomHead[i].h / 2);
         
         pipeTop[i].x -= speed;
-        pipeTopHead[i].x = pipeTop[i].x;
+        pipeTopHead[i].x = pipeTop[i].x - (pipeBottomHead[i].h / 2);
     }
     generatePipes();
 }
@@ -195,6 +195,7 @@ void points()
     {
         if(pipeBottom[i].x + objWidth == rectPlayer.x)
         {
+            SDL_Log("score: %d", score);
             score++;
         }
     }
