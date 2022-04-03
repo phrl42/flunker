@@ -8,7 +8,7 @@ SRCS = main.c init.c
 OBJS = $(addprefix $(OBJ_DIR), $(SRCS:.c=.o))
 
 CC = cc
-CFLAGS = -Wall -Wextra -Wpedantic -g -I$(INC_DIR)
+CFLAGS = -static-libgcc -Wall -Wextra -Wpedantic -g -I$(INC_DIR)
 LFLAGS = -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf
 
 all: $(NAME)
