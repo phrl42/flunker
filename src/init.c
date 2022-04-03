@@ -175,7 +175,6 @@ void moveLanes()
         pipeBottom[i].y = (HEIGHT - pipeBottom[i].h) - rectBottom.h;
         pipeBottomHead[i].y = pipeBottom[i].y - pipeBottomHead[i].h;
 
-
         // make pipeTopHead relative to pipeTop's height
         pipeTopHead[i].y = pipeTop[i].h;
 
