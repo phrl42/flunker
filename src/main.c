@@ -50,6 +50,7 @@ int main()
             moveLanes();
             playerMovement();
             points();
+            changeSeconds();
             // switch front buffer with back buffer or vice versa
             SDL_RenderPresent(rend);
             while (SDL_PollEvent(&ev))

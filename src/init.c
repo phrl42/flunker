@@ -14,6 +14,11 @@ int speed = 4;
 int score = 0;
 int highscore = 0;
 
+Uint32 temp0 = 0;
+Uint32 temp1;
+
+int seconds = 1;
+
 SDL_Window *win;
 SDL_Renderer *rend;
 
@@ -111,6 +116,8 @@ void drawLanes()
     SDL_SetRenderDrawColor(rend, 173, 216, 230, 1);
 }
 
+int limiter = 0;
+
 void playerMovement()
 {
     keys = SDL_GetKeyboardState(NULL);
@@ -137,11 +144,36 @@ void playerMovement()
         }
     }
 
-    rectPlayer.y += speed; // ,,physics''
+    rectPlayer.y += speed * seconds; // ,,physics''
 
     if (keys[SDL_SCANCODE_SPACE] == 1)
     {
-        rectPlayer.y -= 10;
+        if(limiter == 0)
+        {
+            seconds = 1;
+        }
+        rectPlayer.y -= (speed * seconds) + speed;
+        limiter++;
+    }
+    else 
+    {
+        // so the timer gets resetted once per jump (hinders constant pressing 'cheat') and long holded jumps are being penalized
+        limiter = 0;
+    }
+}
+
+void changeSeconds()
+{
+    temp1 = SDL_GetTicks();
+    if(!temp0)
+    {
+        temp0 = temp1;
+    }
+    // SDL_TICKS_PASSED() exists
+    if(temp0 + 1000 == temp1)
+    {
+        temp0 = temp1;
+        seconds++;
     }
 }
 
@@ -194,7 +226,7 @@ void points()
     {
         if(pipeBottom[i].x + objWidth == rectPlayer.x)
         {
-            SDL_Log("score: %d", score);
+            //SDL_Log("score: %d\n", score);
             score++;
         }
     }
