@@ -1,5 +1,7 @@
 #include "incs.h"
 
+bool failure = false;
+
 const int objWidth = 100;
 
 const Uint8 *keys;
@@ -40,6 +42,17 @@ SDL_Texture *texturePipe;
 SDL_Texture *texturePipeBottom;
 SDL_Texture *texturePipeTop;
 
+SDL_Texture *startTexture;
+SDL_Texture *restartTexture;
+
+SDL_Rect startRect = {WIDTH / 2, HEIGHT / 2, 350, 150};
+
+TTF_Font *scoreDisplayFont;
+SDL_Surface *scoreDisplay;
+SDL_Texture *scoreTexture;
+SDL_Color black = {0, 0, 0, 0};
+SDL_Rect scoreRect = {(WIDTH / 2) - 30, 0, 30, 50};
+
 // stolen from phrl42/pong
 
 int randRange(int min, int max)
@@ -73,7 +86,6 @@ void init()
     texturePipeBottom = IMG_LoadTexture(rend, "src/img/pipeHeadUp.png");
     texturePipeTop = IMG_LoadTexture(rend, "src/img/pipeHeadDown.png");
 
-
     for (int i = 0; i < pipes; i++)
     {
         pipeBottom[i].w = 82;
@@ -92,14 +104,34 @@ void init()
         pipeBottomHead[i].x = pipeBottom[i].x - 18;
         pipeTopHead[i].x = pipeTop[i].x - 18;
     }
+
+    startTexture = IMG_LoadTexture(rend, "src/img/start.png");
+    restartTexture = IMG_LoadTexture(rend, "src/img/restart.png");
+
+    if(TTF_Init() == -1)
+    {
+        SDL_Log("initializing sdl2 ttf failed: %s\n", SDL_GetError());
+    }
+    scoreDisplayFont = TTF_OpenFont("src/ttf/mononoki-Regular.ttf", 18);
+    scoreDisplay = TTF_RenderText_Solid(scoreDisplayFont, "F", black);
+    scoreTexture = SDL_CreateTextureFromSurface(rend, scoreDisplay); 
 }
 
-void drawLanes()
+void drawBackground()
 {
     SDL_RenderCopy(rend, textureGround, NULL, &rectBottom);
 
     SDL_SetRenderDrawColor(rend, 0, 0, 255, 0);
 
+    SDL_SetRenderDrawColor(rend, 255, 0, 0, 0);
+
+    SDL_RenderFillRect(rend, &rectPlayer);
+
+    SDL_SetRenderDrawColor(rend, 173, 216, 230, 1);
+}
+
+void drawLanes()
+{
     for (int i = 0; i < pipes; i++)
     {
         SDL_RenderCopy(rend, texturePipe, NULL, &pipeBottom[i]);
@@ -108,12 +140,6 @@ void drawLanes()
         SDL_RenderCopy(rend, texturePipeBottom, NULL, &pipeBottomHead[i]);
         SDL_RenderCopy(rend, texturePipeTop, NULL, &pipeTopHead[i]);
     }
-
-    SDL_SetRenderDrawColor(rend, 255, 0, 0, 0);
-
-    SDL_RenderFillRect(rend, &rectPlayer);
-
-    SDL_SetRenderDrawColor(rend, 173, 216, 230, 1);
 }
 
 int limiter = 0;
@@ -126,6 +152,7 @@ void playerMovement()
     if (rectPlayer.y + rectPlayer.h >= rectBottom.y)
     {
         speed = 0;
+        failure = true;
         return;
     }
     else if (rectPlayer.y < 0)
@@ -140,6 +167,7 @@ void playerMovement()
         if (SDL_IntersectRect(&rectPlayer, &pipeBottomHead[i], &brezhnev) == SDL_TRUE || SDL_IntersectRect(&rectPlayer, &pipeTopHead[i], &brezhnev) == SDL_TRUE || SDL_IntersectRect(&rectPlayer, &pipeTop[i], &brezhnev) == SDL_TRUE || SDL_IntersectRect(&rectPlayer, &pipeBottom[i], &brezhnev) == SDL_TRUE)
         {
             speed = 0;
+            failure = true;
             return;
         }
     }
@@ -232,9 +260,40 @@ void points()
     }
 }
 
-void menuStuff()
+void menuStuff(bool restart)
 {
-    
+    if(restart)
+    {
+        SDL_RenderCopy(rend, restartTexture, NULL, &startRect);
+    }
+    else
+    {
+        SDL_RenderCopy(rend, startTexture, NULL, &startRect);
+    }
+}
+
+void reset()
+{
+    speed = 4;
+    limiter = 0;
+
+    rectPlayer.x = 3 + (WIDTH / 3) - 100;
+    rectPlayer.y = HEIGHT / 2;
+
+    for (int i = 0; i < pipes; i++)
+    {
+        // 264 is the nearest possible value for the distance between the pipes (one could calculate this)
+        pipeTop[i].x = WIDTH - (i * 264);
+        pipeBottom[i].x = WIDTH - (i * 264);
+
+        pipeBottomHead[i].x = pipeBottom[i].x - 18;
+        pipeTopHead[i].x = pipeTop[i].x - 18;
+    }
+}
+
+void displayPoints()
+{
+    SDL_RenderCopy(rend, scoreTexture, NULL, &scoreRect);
 }
 
 void errorSolution()
@@ -242,8 +301,13 @@ void errorSolution()
     SDL_DestroyTexture(texturePipeTop);
     SDL_DestroyTexture(texturePipeBottom);
     SDL_DestroyTexture(textureGround);
+    SDL_DestroyTexture(startTexture);
+    SDL_DestroyTexture(restartTexture);
+    SDL_DestroyTexture(scoreTexture);
     SDL_DestroyRenderer(rend);
     SDL_DestroyWindow(win);
+    TTF_CloseFont(scoreDisplayFont);
+    TTF_Quit();
     IMG_Quit();
     SDL_Quit();
 }
