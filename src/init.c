@@ -45,7 +45,7 @@ SDL_Texture *texturePipeTop;
 SDL_Texture *startTexture;
 SDL_Texture *restartTexture;
 
-SDL_Rect startRect = {WIDTH / 2, HEIGHT / 2, 350, 150};
+SDL_Rect startRect = {WIDTH / 3, HEIGHT / 2, 350, 150};
 
 TTF_Font *scoreDisplayFont;
 SDL_Surface *scoreDisplay;
@@ -254,8 +254,12 @@ void points()
     {
         if(pipeBottom[i].x + objWidth == rectPlayer.x)
         {
-            //SDL_Log("score: %d\n", score);
             score++;
+            SDL_Log("score: %d\n", score);
+            if(score >= highscore)
+            {
+                highscore = score;
+            }
         }
     }
 }
@@ -274,8 +278,10 @@ void menuStuff(bool restart)
 
 void reset()
 {
+    score = 0;
     speed = 4;
     limiter = 0;
+    temp0 = 0;
 
     rectPlayer.x = 3 + (WIDTH / 3) - 100;
     rectPlayer.y = HEIGHT / 2;

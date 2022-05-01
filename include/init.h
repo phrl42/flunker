@@ -4,6 +4,7 @@
 #include "incs.h"
 
 extern bool failure;
+extern int highscore;
 extern SDL_Renderer *rend;
 extern SDL_Window *win;
 

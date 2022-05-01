@@ -75,6 +75,7 @@ int main()
             {
                 restart = true;
                 gameLoop = false;
+                SDL_Log("highscore: %d\n", highscore);
             }
 
             while (SDL_PollEvent(&ev))
