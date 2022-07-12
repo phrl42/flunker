@@ -16,6 +16,8 @@ int speed = 4;
 int score = 0;
 int highscore = 0;
 
+char scoreChar[4];
+
 Uint32 temp0 = 0;
 Uint32 temp1;
 
@@ -113,12 +115,14 @@ void init()
         SDL_Log("initializing sdl2 ttf failed: %s\n", SDL_GetError());
     }
     scoreDisplayFont = TTF_OpenFont("src/ttf/mononoki-Regular.ttf", 18);
-    scoreDisplay = TTF_RenderText_Solid(scoreDisplayFont, "F", black);
-    scoreTexture = SDL_CreateTextureFromSurface(rend, scoreDisplay); 
 }
 
 void drawBackground()
 {
+    sprintf(scoreChar, "%d", score);
+    scoreDisplay = TTF_RenderText_Solid(scoreDisplayFont, (const char*)&scoreChar, black);
+    scoreTexture = SDL_CreateTextureFromSurface(rend, scoreDisplay);
+    
     SDL_RenderCopy(rend, textureGround, NULL, &rectBottom);
 
     SDL_SetRenderDrawColor(rend, 0, 0, 255, 0);
