@@ -11,8 +11,8 @@ const int pipes = 5;
 // 100 = pipeBottom width
 int honecker = (WIDTH + objWidth) * -1;
 
+float speedB = 0.125;
 int speed = 4;
-
 int score = 0;
 int highscore = 0;
 
@@ -155,13 +155,14 @@ void playerMovement()
     // ground / top collision
     if (rectPlayer.y + rectPlayer.h >= rectBottom.y)
     {
+        speedB = 0;
         speed = 0;
         failure = true;
         return;
     }
     else if (rectPlayer.y < 0)
     {
-        rectPlayer.y += speed;
+        rectPlayer.y += (int)speed;
         return;
     }
 
@@ -170,42 +171,20 @@ void playerMovement()
     {
         if (SDL_IntersectRect(&rectPlayer, &pipeBottomHead[i], &brezhnev) == SDL_TRUE || SDL_IntersectRect(&rectPlayer, &pipeTopHead[i], &brezhnev) == SDL_TRUE || SDL_IntersectRect(&rectPlayer, &pipeTop[i], &brezhnev) == SDL_TRUE || SDL_IntersectRect(&rectPlayer, &pipeBottom[i], &brezhnev) == SDL_TRUE)
         {
+            speedB = 0;
             speed = 0;
             failure = true;
             return;
         }
     }
 
-    rectPlayer.y += speed * seconds; // ,,physics''
+    rectPlayer.y += speedB; // ,,physics''
+    speedB += 0.125;
 
     if (keys[SDL_SCANCODE_SPACE] == 1)
     {
-        if(limiter == 0)
-        {
-            seconds = 1;
-        }
-        rectPlayer.y -= (speed * seconds) + speed;
-        limiter++;
-    }
-    else 
-    {
-        // so the timer gets resetted once per jump (hinders constant pressing 'cheat') and long holded jumps are being penalized
-        limiter = 0;
-    }
-}
-
-void changeSeconds()
-{
-    temp1 = SDL_GetTicks();
-    if(!temp0)
-    {
-        temp0 = temp1;
-    }
-    // SDL_TICKS_PASSED() exists
-    if(temp0 + 1000 == temp1)
-    {
-        temp0 = temp1;
-        seconds++;
+        rectPlayer.y -= 7.6;
+        speedB = 0.1;
     }
 }
 
